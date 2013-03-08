@@ -6,9 +6,24 @@ path_str() {
         print "$vcs_info_msg_0_"
     fi
 }
-PROMPT='%F{$DECOR_COL}[%F{$TEXT_COL}%n%F{$DECOR_COL}][%F{$TEXT_COL}$(path_str)%F{$DECOR_COL}]%B%F{$TEXT_COL}$PROMPT_CHAR %b%F{7}'
+vim_ins_mode="%{$fg[black]%}[INS]%{$reset_color%}"
+vim_cmd_mode="%{$fg[white]%}[CMD]%{$reset_color%}"
+vim_mode=$vim_ins_mode
+
+function zle-keymap-select {
+  vim_mode="${${KEYMAP/vicmd/${vim_cmd_mode}}/(main|viins)/${vim_ins_mode}}"
+  zle reset-prompt
+}
+zle -N zle-keymap-select
+
+function zle-line-finish {
+  vim_mode=$vim_ins_mode
+}
+zle -N zle-line-finish
+PROMPT='%F{$DECOR_COL}[%F{$TEXT_COL}%n%F{$DECOR_COL}][%F{$TEXT_COL}$(path_str)%F{$DECOR_COL}%F{$DECOR_COL}]%(?..%F{red}-%?-)%B%F{$TEXT_COL}$PROMPT_CHAR %b%F{7}'
+RPROMPT='${vim_mode}'
 PS2="%_ >"
-export PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/bin/core_perl:$HOME/bin
+export PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/bin/core_perl:$HOME/bin:$HOME/.gem/ruby/1.9.1/bin
 
 # zshy config
 HISTFILE="$HOME/.zsh_history"
@@ -16,12 +31,4 @@ HISTSIZE=10000
 SAVEHIST=10000
 PAGER='less -R'
 
-export PERL_LOCAL_LIB_ROOT="$HOME/perl5";
-export PERL_MB_OPT="--install_base $HOME/perl5";
-export PERL_MM_OPT="INSTALL_BASE=$HOME/perl5";
-export PERL5LIB="$HOME/perl5/lib/perl5/x86_64-linux-thread-multi:$HOME/perl5/lib/perl5";
-export PATH="$HOME/perl5/bin:$PATH";
-eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)
-export EDITOR='vim'
-export KEYMAP="dvorak"
-export BROWSER=uzbl-newtab
+# ... lots of boring stuff here ...

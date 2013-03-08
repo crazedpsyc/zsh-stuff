@@ -8,10 +8,10 @@ alias vim='vim -p'
 
 alias lock='vlock-cmatrixreloaded -bfln10'
 alias duck='duckduckgo'
-alias e='vim'
+alias e=$'$EDITOR'
 alias dz='dzil'
 alias ..='cd ..'
-alias l='ls -lah'
+alias l='ls --color=always -lah'
 
 alias man='nocorrect man'
 alias mv='nocorrect mv'
@@ -21,3 +21,24 @@ alias gist='nocorrect gist'
 alias heroku='nocorrect heroku'
 alias ebuild='nocorrect ebuild'
 alias hpodder='nocorrect hpodder'
+alias ls='ls --color=always'
+
+
+# Suffix aliases
+alias -s txt=vim
+alias -s tex=vim
+alias -s com=w3m
+alias -s html=w3m
+alias -s org=w3m
+alias -s net=w3m
+alias ddg.gg='w3m ddg.gg' # DUCK POWAH!
+
+# Global aliases
+# who needs slashes all over the place? we're just moving UP!
+alias -g ...='../..'
+alias -g ....='../../..'
+alias -g .....='../../../..'
+# some long thing |L, anyone?
+alias -g T='tail'
+alias -g L='less'
+alias -g H='head'

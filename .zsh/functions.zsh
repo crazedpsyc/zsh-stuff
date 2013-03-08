@@ -9,29 +9,12 @@ cpanupd() {
     for i ($modlist_raw) {
         [[ "$i" =~ "^\w+(::\w+)*\s+([0-9]+\.[0-9]+\s*){2}$" ]] || continue
         module=$(sed "s/\s*[0-9]\.[0-9]*//g" <(print $i))
-        [[ -n "${(k)local_lib[(r)$module]}" ]] && modlist+=($module)
+        [[ -n "${local_lib[(r)$module]}" ]] && modlist+=($module)
     }
     print "Going to install: $modlist"
     if [[ -z $modlist ]]; then { print "No outdated modules found."; exit }; fi
     print "Installing with cpanm"
-#cpanm $modlist
-}
-
-# magical thing to make feh easier
-vimage() {
-    [[ -z "$@" || ! (-f "$@" || -d "$@") ]] && { print "That is not an image/directory."; return 1 }
-    if [[ -f "$@" ]]; then
-        mimetype=$(file -i "$@")
-        print $mimetype
-        [[ $mimetype =~ ":\simage/\w+;" ]] || { print "That is not an image"; return 1 }
-        size=(${=$(file "$@")})
-        width=$size[5]
-        height=$(sed "s/,//" <(print $size[7]))
-        [[ ! "$width" =~ "^[0-9]+$" || ! "$height" =~ "^[0-9]+$" ]] && { print "Error getting size. B0rk."; return 1 }
-        feh -g ${width}x${height} $@
-    elif [[ -d "$@" ]]; then
-        feh "$@"
-    fi
+    cpanm $modlist
 }
 
 dukgo() {
@@ -46,6 +29,7 @@ dukgo() {
     fi
 }
 
+# github-pullfork
 gh-pf() {
     remote=$(git config --local --get branch.master.remote)
     url=$(git config --local --get remote.$remote.url)
@@ -53,20 +37,10 @@ gh-pf() {
     git pull git://github.com/$1/$name.git
 }
 
+# quick grep IRC logs
 wgrep() {
     egrep $3 $1 ~/.weechat/logs/irc.$2.weechatlog 
 }
-
-## scripting helper functions
-
-#new() {
-#   local parsed
-#local type name value
-#   for arg ($@) {
-#       
-#   }
-
-#}
 
 # Zenburn colour scheme
 zenburn() {
@@ -131,14 +105,48 @@ function precmd {
   title "%15<..<%~%<<" "%n@%m: %~"
 }
 
+# This helps with screen especially
 function preexec {
   emulate -L zsh
   setopt extended_glob
   local CMD=${1[(wr)^(*=*|sudo|ssh|-*)]} #cmd name only, or if this is sudo or ssh, the next cmd
   title "$CMD" "%100>...>$2%<<"
 }
+
+# Turn any command into a REPL
+repl() {
+    type "$1" &>/dev/null || { print "$1: command not found."; return }
+    while true; do
+        print -Pn "%F{$TEXT_COL}$1%F{$DECOR_COL}> %F{7}"
+        read args;
+        $@ $args;
+    done
+}
+
+# Quick ../../..
+rationalise-dot() {
+    if [[ $LBUFFER = *.. ]]; then
+        LBUFFER+=/..
+    else
+        LBUFFER+=.
+    fi
+}
+
+ompld() { omup $@ | xclip -selection clipboard }
+
+# cd with support for automounting remote directories (SSHFS)
+cd() {
+    if [[ "$@" != "" && ! -d "$@" && "$@" =~ "^\S+@\S+$" ]]; then
+        mkdir -p "$HOME/mnt/$(basename $@)" && sshfs "$@" "$HOME/mnt/$(basename $@)" && builtin cd "$HOME/mnt/$(basename $@)"
+    else
+        builtin cd "$@"
+    fi
+}
+
+zle -N rationalise-dot
+bindkey . rationalise-dot
+
 autoload -U add-zsh-hook
 add-zsh-hook precmd  precmd
 add-zsh-hook preexec preexec
 
-export cpanupd vimage dukgo 

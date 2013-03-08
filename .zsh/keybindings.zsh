@@ -1,4 +1,4 @@
-bindkey -e
+bindkey -v
 
 # Basic movement
 bindkey "\e[1~" beginning-of-line # Home

@@ -1,30 +1,27 @@
-#ZSH=$HOME/.oh-my-zsh
-#ZSH_THEME="darkblood"
-#DISABLE_AUTO_UPDATE="true"
-#plugins=(git archlinux django perl ssh-agent cpanm duckpan)
-
 # ZSH POWAHHH!
 autoload -U compinit
 autoload -Uz vcs_info
 compinit -i
 
+[[ "$TERM" == "screen" || "$TERM" == "xterm" ]] && export TERM="$TERM-256color"
 # Colors
-if [[ "$TTY" =~ '^/dev/pts' ]]; then 
+if [[ "$TERM" =~ '256color' ]]; then # if 256col is available, UTF8 probably is as well
     TEXT_COL='12'
     DECOR_COL='8'
     PROMPT_CHAR='➤'
 else
-    TEXT_COL='0'
+    TEXT_COL='7'
     DECOR_COL='4'
     PROMPT_CHAR='>'
 fi
 
-for omzp (~/.oh-my-zsh/plugins/{archlinux/archlinux,git/git}.plugin.zsh) . $omzp
+# plugins stolen from oh-my-zsh
+for omzp (~/.oh-my-zsh/plugins/{archlinux/archlinux,git/git,ssh-agent/ssh-agent}.plugin.zsh) . $omzp
+# My stuff
 for conf (~/.zsh/*.zsh) . $conf
 
-#. .zsh/completion/*.zsh
-
-[[ "$TERM" == "screen" || "$TERM" == "xterm" ]] && export TERM="$TERM-256color"
+# Interactive synatx highlighting!
+. ~/git/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # known_hosts completion
 local _myhosts
@@ -34,3 +31,4 @@ if [[ -f $HOME/.ssh/known_hosts ]]; then
 fi
 
 export LOCKPRG=vlock
+fpath=(~/git/zsh-completions/src $fpath)
